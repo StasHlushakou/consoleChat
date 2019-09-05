@@ -109,14 +109,19 @@ public class User extends Thread{
     public void run() {
         try {
             while (true) {
-                String word = getIn().readLine();
-
+                String word ;
+                while (true){
+                    word = getIn().readLine();
+                    if (word != null){
+                        break;
+                    }
+                }
                 // занесение в буфер сообщений, пока пользователь не подключён к другому пользователю
                 // и очистка буфера при подключении
-                if (!isConect){
+                if (!isConect && !isAgent){
                     messagesBufer.add(word);
                     continue;
-                } else if (!messagesBufer.isEmpty()) {
+                } else if (!messagesBufer.isEmpty() && !isAgent) {
                     for (String str : messagesBufer){
                         getOut().write(str + "\n");
                         messagesBufer.remove(str);
@@ -139,7 +144,6 @@ public class User extends Thread{
             }
         } catch (IOException e) {
             System.err.println(e);
-
         }
     }
 }

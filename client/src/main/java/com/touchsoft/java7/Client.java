@@ -17,29 +17,3 @@ public class Client {
     }
 
 }
-//----------------------------------------------------------------------------------------------------------------
-
-/*
-        try {
-            try (Socket clientSocket = new Socket(ipAddr, port);
-                 BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-                 BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                 BufferedWriter out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()))){
-
-
-
-                System.out.println("Вы что-то хотели сказать? Введите это здесь:");
-
-
-                while (true) {
-                    String word = reader.readLine(); // ждём пока клиент что-нибудь  не напишет в консоль
-                    out.write(word + "\n"); // отправляем сообщение на сервер
-                    out.flush();
-                }
-
-
-            }
-        } catch (IOException e) {
-            System.err.println(e);
-        }
-*/

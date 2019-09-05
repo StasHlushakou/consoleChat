@@ -135,9 +135,9 @@ class ClientSomthing {
                         out.flush();
                     }
 
-                    ClientSomthing.this.downService(); // харакири
-                }
 
+                }
+                ClientSomthing.this.downService(); // харакири
 
             } catch (IOException e) {
                 ClientSomthing.this.downService(); // в случае исключения тоже харакири
