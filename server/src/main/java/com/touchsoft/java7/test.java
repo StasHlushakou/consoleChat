@@ -13,10 +13,13 @@ public class test {
 
         for (int in : i){
             System.out.print(in + " ");
+            //i.remove(in);
         }
-        System.out.println();
+        i.clear();
 
-        Integer k = 4;
+        System.out.println(i.isEmpty());
+
+        /*Integer k = 4;
         i.remove(k);
         i.remove(0);
         i.remove(0);
@@ -25,5 +28,6 @@ public class test {
         for (int in = 0; in < i.size(); in++){
             System.out.print(i.get(in) + " ");
         }
+        */
     }
 }

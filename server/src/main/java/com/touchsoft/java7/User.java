@@ -5,53 +5,51 @@ import java.net.*;
 import java.util.*;
 
 
-public class User extends Thread{
+public class User extends Thread {
 
     //инициализируются конструктором
-    private BufferedReader in;      //буфер ввода сообщений от пользователля
-    private Socket userSocket;      //сокет
-    private Boolean isAgent;        //флаг агент
-    private String userName;        //имя пользователя
 
-    //инициализируются в ходе работы
-    private BufferedWriter out;     //буфер отправки сообщений связанному пользователю
-    private Boolean isConect;       //флаг соединентя
-    private User connectUser;       //ссылка на связанного пользователя
+    private Boolean isAgent;            //флаг агент
+    private Boolean isConnected;        //флаг соединентя
+    private Boolean waitingConnection;  //флаг ожидания подключения
 
-    public static ArrayList<String> messagesBufer; //буфер сообщений пользователя
+    private Socket userSocket;          //сокет
+    private String userName;            //имя пользователя
 
+    private BufferedReader in;          //буфер ввода сообщений от пользователля
+    private BufferedWriter out;         //буфер вывода сообщений другому пользователю
 
+    private User connectUser;           //соединённый пользователь
 //----------------------------------------------------------------------------------------------------------------------
 
-    //геттер isAgent
+    // геттер isAgent
     public Boolean getIsAgent(){
         return isAgent;
     }
 
-    //геттер getIsConect
-    public Boolean getIsConect(){
-        return isConect;
+    // геттер getIsConect
+    public Boolean getIsConnected(){
+        return isConnected;
     }
 
-    //геттер in
-    public BufferedReader getIn(){
-        return in;
+    // геттер waitingConnection
+    public  Boolean getWaitingConnection () {
+        return waitingConnection;
     }
 
-    //геттер out
-    public BufferedWriter getOut(){
-        return out;
+    //
+    public void exitUser(){
+        UserList.dellUser(this);
     }
 
-    //геттер connectUser
-    public User getConnectUser(){
-        return connectUser;
-    }
 
-    //конструктор User, получает на вход сокет, инициализирует имя и класс пользователя, запускает нить
+
+    //конструктор User, получает на вход сокет, инициализирует имя и класс пользователя,
+    // запускает нить, слушающую сообщения от пользователя
     public User(Socket userSocket){
         this.userSocket = userSocket;
-        try{
+
+        try {
             this.in = new BufferedReader(new InputStreamReader(this.userSocket.getInputStream()));
             String word = in.readLine();
             if (word.equals("agent")){
@@ -62,12 +60,15 @@ public class User extends Thread{
 
             word = in.readLine();
             userName = word;
+            this.isConnected = false;
+            this.waitingConnection = true;
+            System.out.println(isAgent + " " + userName + " " + isConnected + " " + waitingConnection);
+            start();
+
         } catch (IOException e){
             System.out.println(e);
         }
-        this.messagesBufer = new ArrayList<>();
-        this.isConect = false;
-        start();
+
     }
 
 
@@ -76,69 +77,69 @@ public class User extends Thread{
         try{
             user.out = new BufferedWriter(new OutputStreamWriter(this.userSocket.getOutputStream()));
             this.out = new BufferedWriter(new OutputStreamWriter(user.userSocket.getOutputStream()));
+            user.connectUser = this;
+            this.connectUser = user;
+
+            user.out.write("isConnected" + "\n");
+            user.out.flush();
+
+            this.out.write("isConnected" + "\n");
+            this.out.flush();
+
+            user.isConnected = true;
+            this.isConnected = true;
+
         } catch (IOException e){
             System.out.println(e);
         }
 
-        user.isConect = true;
-        this.isConect = true;
-
-        user.connectUser = this;
-        this.connectUser = user;
-
-
+        System.out.println("Соединение создано ");
 
     }
 
     //разъединение чата двух пользователей (отключение выводных потоков, сброс флага соединения и ссылки на связанного пользователя)
     private void unconnectUsers(User user){
-        user.out = null;
-        user.isConect = false;
-        user.connectUser = null;
-        this.out = null;
-        this.isConect = false;
-        this.connectUser = null;
+
+        try {
+
+            user.out.close();
+            user.isConnected = false;
+            user.connectUser = null;
+            this.out.close();
+            this.isConnected = false;
+            this.connectUser = null;
+            System.out.println("Разъединение");
+        } catch (IOException e){
+            System.out.println(e +"при разъединении");
+        }
+
 
     }
-
-
-
 
 
     @Override
     public void run() {
         try {
             while (true) {
-                String word ;
-                while (true){
-                    word = getIn().readLine();
-                    if (word != null){
-                        break;
-                    }
-                }
-                // занесение в буфер сообщений, пока пользователь не подключён к другому пользователю
-                // и очистка буфера при подключении
-                if (!isConect && !isAgent){
-                    messagesBufer.add(word);
+                String word = in.readLine();
+                if (word == null){
                     continue;
-                } else if (!messagesBufer.isEmpty() && !isAgent) {
-                    for (String str : messagesBufer){
-                        getOut().write(str + "\n");
-                        messagesBufer.remove(str);
-                    }
                 }
+
+                System.out.println(word);
 
                 //разрушение связи при отключении одного из абонентов
                 if (word.equals("leave") || word.equals("exit")) {
-                    getOut().write(word + "\n");
-                    getOut().flush();
-                    this.unconnectUsers(connectUser);
+                    out.write(word + "\n");
+                    out.flush();
+                    unconnectUsers(connectUser);
                 } else {
-                    getOut().write(word + "\n");
-                    getOut().flush();
+                    out.write(word + "\n");
+                    out.flush();
                 }
 
                 if (word.equals("exit")) {
+                    this.exitUser();
                     break;
                 }
             }
@@ -146,4 +147,6 @@ public class User extends Thread{
             System.err.println(e);
         }
     }
+
+
 }
