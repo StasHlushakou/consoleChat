@@ -19,12 +19,7 @@ class ClientSomthing {
 
     private boolean isConected;     //
 
-    /*
-    private Date            time;
-    private String          dtime;
-    private SimpleDateFormat dt1;
 
-    */
 
 
     public static ArrayList<String> messagesBuffer; //буфер сообщений пользователя
@@ -93,12 +88,14 @@ class ClientSomthing {
     private void downService() {
         try {
             if (!socket.isClosed()) {
-                //socket.close();
+                socket.close();
                 in.close();
                 out.close();
             }
             messagesBuffer.clear();
         } catch (IOException ignored) {}
+
+        System.out.println("Ломаем соединение");
     }
 
     // нить чтения сообщений с сервера
@@ -149,13 +146,13 @@ class ClientSomthing {
                     String userWord = inputUser.readLine(); // сообщения с консоли
 
                     if (!isConected){
-                        /*
-                        if (inputUser.equals("exit")){
+
+                        /*if (inputUser.equals("exit")){
                             out.write("exit" + "\n");
                             out.flush();
                             break;
-                        }
-                        */
+                        }*/
+
                         messagesBuffer.add(userWord);
                         continue;
                     }
