@@ -18,6 +18,7 @@ public class UserList extends Thread {
         } else {
             clientList.add(user);
         }
+        System.out.println("Добавлен " + user.getName());
     }
 
     // Удаляет пользователя из нужной коллекции
@@ -27,6 +28,8 @@ public class UserList extends Thread {
         } else {
             clientList.remove(user);
         }
+        System.out.println("Удалён " + user.getName());
+
     }
 
     // Конструктор, инициализирует коллекции и запускает нить проверки пользователей, готовых к подключению
@@ -34,6 +37,7 @@ public class UserList extends Thread {
         clientList = new ArrayList<>();
         agentList = new ArrayList<>();
         start();
+        System.out.println("Запущен UserList");
     }
 
 

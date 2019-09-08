@@ -49,7 +49,9 @@ class ClientSomthing {
             new WriteMsg().start(); // нить пишущая сообщения в сокет приходящие с консоли в бесконечном цикле
         } catch (IOException e) {
             ClientSomthing.this.downService();
+            System.out.println("исключение в конструкторе пользователя");
         }
+
     }
 
 
@@ -91,7 +93,7 @@ class ClientSomthing {
     private void downService() {
         try {
             if (!socket.isClosed()) {
-                socket.close();
+                //socket.close();
                 in.close();
                 out.close();
             }
@@ -108,6 +110,10 @@ class ClientSomthing {
             try {
                 while (true) {
                     str = in.readLine(); // ждем сообщения с сервера
+                    if (str == null){
+                        continue;
+                    }
+
 
                     if (str.equals("isConnected")){
                         isConected = true;
@@ -171,8 +177,8 @@ class ClientSomthing {
                     } else if(userWord.equals("leave")){
                         out.write("leave" + "\n");
                         out.flush(); // чистим
-                        out.write("ready" + "\n");
-                        out.flush();
+                        /*out.write("ready" + "\n");
+                        out.flush();*/
                         isConected = false;
 
                     }else {

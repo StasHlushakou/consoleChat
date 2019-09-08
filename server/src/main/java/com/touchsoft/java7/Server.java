@@ -21,7 +21,7 @@ public class Server {
 
             }
         } catch (IOException e) {
-            System.err.println(e + " - Exception on server");
+            System.err.println(e + " - исключение на Server");
         }
     }
 }
