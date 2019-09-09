@@ -54,15 +54,6 @@ public class User extends Thread {
         return userName;
     }
 
-    //
-/*
-    public void exitUser(){
-        UserList.dellUser(this);
-        logger.info("exitUser " + this.getUserName());
-    }
-*/
-
-
 
     //конструктор User, получает на вход сокет, инициализирует имя и класс пользователя,
     // запускает нить, слушающую сообщения от пользователя
