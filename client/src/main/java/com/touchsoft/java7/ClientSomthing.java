@@ -6,7 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-class ClientSomthing {
+public class ClientSomthing {
 
     private String          addr; // ip адрес клиента
     private int             port; // порт соединения
@@ -18,9 +18,6 @@ class ClientSomthing {
     private String          name; // имя клиента
 
     private boolean isConected;     //
-
-
-
 
     public static ArrayList<String> messagesBuffer; //буфер сообщений пользователя
 
@@ -78,7 +75,7 @@ class ClientSomthing {
 
 
 /*            out.write("ready" + "\n");
-            out.flush();*/
+           out.flush();*/
         } catch (IOException ignored) { }
 
         messagesBuffer = new ArrayList<>();
@@ -121,6 +118,8 @@ class ClientSomthing {
                     if (str.equals("exit") || str.equals("leave")) {
                         System.out.println("Собеседник покинул чат, ожидайте одключения к другому собеседнику");
                         isConected = false;
+                        out.write("ready" + "\n");
+                        out.flush();
                     } else {
                         System.out.println(str); // пишем сообщение с сервера на консоль
                     }
@@ -154,6 +153,8 @@ class ClientSomthing {
                         }*/
 
                         messagesBuffer.add(userWord);
+                        out.write("ready" + "\n");
+                        out.flush();
                         continue;
                     }
 
@@ -193,11 +194,3 @@ class ClientSomthing {
         }
     }
 }
-
-
-/*
-                        time = new Date(); // текущая дата
-                        dt1 = new SimpleDateFormat("HH:mm:ss"); // берем только время до секунд
-                        dtime = dt1.format(time); // время
-                        out.write("(" + dtime + ") " + name + ": " + userWord + "\n"); // отправляем на сервер
-                        */

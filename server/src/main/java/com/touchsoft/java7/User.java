@@ -1,5 +1,7 @@
 package com.touchsoft.java7;
 
+import org.apache.log4j.Logger;
+
 import java.io.*;
 import java.net.*;
 import java.text.SimpleDateFormat;
@@ -7,6 +9,8 @@ import java.util.*;
 
 
 public class User extends Thread {
+
+    final static Logger logger = Logger.getLogger(User.class);
 
     //инициализируются конструктором
 
@@ -22,16 +26,17 @@ public class User extends Thread {
 
     private User connectUser;           //соединённый пользователь
 
-    //добавление времени
-    private Date            time;
-    private String          dtime;
-    private SimpleDateFormat dt1;
 
 //----------------------------------------------------------------------------------------------------------------------
 
     // геттер isAgent
     public Boolean getIsAgent(){
         return isAgent;
+    }
+
+    // сеттер isAgent
+    public void setIsAgent(boolean isAgent){
+        this.isAgent = isAgent;
     }
 
     // геттер getIsConect
@@ -45,13 +50,17 @@ public class User extends Thread {
     }
 
     // геттер имени
-    public String getUserName (){return userName; }
+    public String getUserName (){
+        return userName;
+    }
 
     //
+/*
     public void exitUser(){
         UserList.dellUser(this);
-        System.out.println("Выход " + this.getUserName());
+        logger.info("exitUser " + this.getUserName());
     }
+*/
 
 
 
@@ -75,13 +84,10 @@ public class User extends Thread {
             this.waitingConnection = true;
             start();
 
-            System.out.println("Создан " + this.getUserName() + " и запущена его нить ");
-
         } catch (IOException e){
-            System.out.println(e);
+            logger.error(e + " in constructor User.");
         }
-
-
+        logger.info("Create User " + this.getUserName());
 
     }
 
@@ -90,11 +96,7 @@ public class User extends Thread {
     public void connectUsers(User user){
         try{
             this.out = new BufferedWriter(new OutputStreamWriter(user.userSocket.getOutputStream()));
-            System.out.println("this.out ");
-
             user.out = new BufferedWriter(new OutputStreamWriter(this.userSocket.getOutputStream()));
-            System.out.println("user.out ");
-
 
             user.connectUser = this;
             this.connectUser = user;
@@ -112,15 +114,15 @@ public class User extends Thread {
             this.waitingConnection = false;
 
         } catch (IOException e){
-            System.out.println(e + " исключение при connectUsers");
+            logger.error(e + " in connectUsers.");
         }
 
-        System.out.println("Соединение создано между " + this.getUserName() + " и " + user.getUserName() );
+        logger.info("Connect User " + this.getUserName() + " with" + user.getUserName());
 
     }
 
     //разъединение чата двух пользователей (отключение выводных потоков, сброс флага соединения и ссылки на связанного пользователя)
-    private void unconnectedUsers(User user){
+    public void unconnectedUsers(User user){
 
         user.isConnected = false;
         user.connectUser = null;
@@ -128,35 +130,29 @@ public class User extends Thread {
         this.isConnected = false;
         this.connectUser = null;
 
-        user.waitingConnection = true;
-        this.waitingConnection = true;
+        user.waitingConnection = false;
+        this.waitingConnection = false;
 
-        System.out.println("Разъединение " + this.getUserName() + " и " + user.getUserName() );
+        logger.info("unconnectedUsers " + this.getUserName() + " with" + user.getUserName());
 
     }
 
 
     @Override
     public void run() {
-
+        //logger.info("Start thread User");
         try {
             while (true) {
-
-/*
-                if (!this.isConnected){
-                    sleep();
-                    continue;
-                }
-*/
 
                 String word = in.readLine();
                 if (word == null){
                     continue;
                 }
 
-                System.out.println(word);
-
-
+                if (!this.waitingConnection && !this.isConnected && word.equals("ready")){
+                    this.waitingConnection = true;
+                    continue;
+                }
 
                 //разрушение связи при отключении одного из абонентов
                 if (word.equals("leave")) {
@@ -167,23 +163,20 @@ public class User extends Thread {
                     out.write(word + "\n");
                     out.flush();
                     this.unconnectedUsers(connectUser);
-                    this.exitUser();
+                    UserList.dellUser(this);
                     break;
                 } else {
-                    time = new Date(); // текущая дата
-                    dt1 = new SimpleDateFormat("HH:mm:ss"); // берем только время до секунд
-                    dtime = dt1.format(time); // время
+                    Date time = new Date(); // текущая дата
+                    SimpleDateFormat dt1 = new SimpleDateFormat("HH:mm:ss"); // берем только время до секунд
+                    String dtime = dt1.format(time); // время
                     out.write("(" + dtime + ") " + userName + ": " + word + "\n"); // отправляем на сервер
                     out.flush();
                 }
 
             }
         } catch (IOException e) {
-            System.err.println(e);
-
+            logger.error(e + " in thread User.");
         }
-
     }
-
 
 }

@@ -1,10 +1,13 @@
 package com.touchsoft.java7;
 
 
+import org.apache.log4j.Logger;
+
 import java.net.Socket;
 import java.util.ArrayList;
 
 public class UserList extends Thread {
+    final static Logger logger = Logger.getLogger(UserList.class);
 
     private static ArrayList<User> clientList;
     private static ArrayList<User> agentList;
@@ -18,7 +21,7 @@ public class UserList extends Thread {
         } else {
             clientList.add(user);
         }
-        System.out.println("Добавлен " + user.getName());
+        logger.info("Create " + user.getUserName() + " and add to List");
     }
 
     // Удаляет пользователя из нужной коллекции
@@ -28,26 +31,25 @@ public class UserList extends Thread {
         } else {
             clientList.remove(user);
         }
-        System.out.println("Удалён " + user.getName());
-
+        logger.info("dellUser " + user.getUserName());
     }
 
     // Конструктор, инициализирует коллекции и запускает нить проверки пользователей, готовых к подключению
     public UserList(){
         clientList = new ArrayList<>();
         agentList = new ArrayList<>();
+        //logger.info("Create UserList");
         start();
-        System.out.println("Запущен UserList");
     }
 
 
     @Override
     public void run(){
+        //logger.info("Start thread UserList");
 
         while (true) {
 
             for (User userClient : clientList) {
-
                 if (!(userClient.getIsConnected()) && userClient.getWaitingConnection()) {
                     for (User userAgent : agentList) {
                         if ((!userAgent.getIsConnected()) && userAgent.getWaitingConnection()) {
@@ -57,15 +59,11 @@ public class UserList extends Thread {
                     }
                 }
             }
-
             try {
-                sleep(1000);
+                sleep(500);
             }catch (InterruptedException e){
-                System.out.println(e);
+                logger.error(e + " in thread UserList.");
             }
-
         }
     }
-
-
 }
