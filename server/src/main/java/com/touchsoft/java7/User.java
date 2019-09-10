@@ -108,7 +108,7 @@ public class User extends Thread {
             logger.error(e + " in connectUsers.");
         }
 
-        logger.info("Connect User " + this.getUserName() + " with" + user.getUserName());
+        logger.info("Connect User " + this.getUserName() + " with " + user.getUserName());
 
     }
 

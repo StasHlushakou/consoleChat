@@ -92,7 +92,7 @@ public class ClientSomthing {
             messagesBuffer.clear();
         } catch (IOException ignored) {}
 
-        System.out.println("Ломаем соединение");
+        //System.out.println("Ломаем соединение");
     }
 
     // нить чтения сообщений с сервера
