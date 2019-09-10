@@ -12,32 +12,86 @@ public class UserSocket extends Thread {
 
     private static Logger logger = Logger.getLogger(UserSocket.class);
 
-    private User user;                      // Пользователь, от которого нить принимает сообщения
 
-    private Socket userSocket;              // сокет
+
+    private Socket socket;                  // сокет
     private BufferedReader in;              // буфер ввода сообщений от пользователля
     private BufferedWriter out;             // буфер вывода сообщений  пользователю
-    private BufferedWriter outToConnected;  // буфер вывода сообщений связанному пользователю
+    private User userIn;                    // Пользователь, от которого нить принимает сообщения
+
+    private User userOut;                   // Пользователь, которому нить пересылает сообщения
+
 
 
     public UserSocket (Socket userSocket){
-        this.userSocket = userSocket;
+        this.socket = userSocket;
+        userIn = null;
 
         try {
-            this.in = new BufferedReader(new InputStreamReader(this.userSocket.getInputStream()));
-            this.out = new BufferedWriter(new OutputStreamWriter(this.userSocket.getOutputStream()));
+            this.in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
+            this.out = new BufferedWriter(new OutputStreamWriter(this.socket.getOutputStream()));
         } catch (IOException e){
             logger.error(e + " in constructor.");
         }
+        start();
         logger.info("Socket connection created ");
     }
 
-//----------------------------------------------------------------------------------------------------------------------
 
-    public void connect(User user){
-        outToConnected = new BufferedWriter(new OutputStreamWriter(user.getConnectUser().userSocket.getOutputStream()));
+
+    //создание чата двух пользователей(настройка выводных потоков,установка флага соединения и ссылки на связанного пользователя)
+    public static void connectUsers(User user1, User user2){
+
+        user1.getUserSocket().userOut = user2;
+        user2.getUserSocket().userOut = user1;
+
+
+        try{
+            user1.getUserSocket().out.write("/c" + "\n");
+            user1.getUserSocket().out.flush();
+
+            user2.getUserSocket().out.write("/c" + "\n");
+            user2.getUserSocket().out.flush();
+
+            user1.setIsConnected(true);
+            user2.setIsConnected(true);
+
+            user1.setWaitingConnection(false);
+            user2.setWaitingConnection(false);
+
+        } catch (IOException e){
+            logger.error(e + " in connectUsers.");
+        }
+
+        logger.info("Connect User " + user1.getUserName() + " with " + user2.getUserName());
+
     }
 
+
+
+    //разъединение чата двух пользователей (отключение выводных потоков, сброс флага соединения и ссылки на связанного пользователя)
+    public void unconnectedUsers(){
+
+
+        try {
+            userOut.getUserSocket().out.write("/l" + "\n");
+            userOut.getUserSocket().out.flush();
+        } catch (IOException e){
+            logger.error(e + " in unconnectedUsers.");
+        }
+
+        logger.info("Unconnected users " + userIn.getUserName() + " with" + userOut.getUserName());
+
+        userIn.setIsConnected(false);
+        userOut.setIsConnected(false);
+
+        userIn.setWaitingConnection(false);
+        userOut.setWaitingConnection(true);
+
+
+        userOut.getUserSocket().userOut = null;
+        userOut = null;
+    }
 
 
 
@@ -49,13 +103,13 @@ public class UserSocket extends Thread {
                 in.close();
             if (out != null)
                 out.close();
-            if (outToConnected != null)
-                outToConnected.close();
-            if (userSocket != null)
-                userSocket.close();
+            if (socket != null)
+                socket.close();
         } catch (IOException e) {
             logger.error(e + " in thread User.");
         }
+
+        logger.info("Socket connection close");
     }
 
 
@@ -65,73 +119,62 @@ public class UserSocket extends Thread {
         //logger.info("Start thread");
         try {
             while (true) {
+
                 String word = in.readLine();
                 if (word == null){
                     continue;
                 }
 
+                System.out.println(word);
 
-
-                if (user == null && !word.equals("/reg" )){
+                if (userIn == null && !word.equals("/reg" )){
                     continue;
                 }
-                if (user == null && word.equals("/reg" )){
+                if (userIn == null && word.equals("/reg" )){
                     Boolean isAgent;
                     String userName;
                     word = in.readLine();
-                    if (word.equals("agent")){
+                    if (word.equals("a")){
                         isAgent = true;
                     } else {
                         isAgent = false;
                     }
-                    word = in.readLine();
-                    userName = word;
-                    user = new User(isAgent, userName, this);
-                    UserList.addUser(user);
+                    userName = in.readLine();
+                    userIn = new User(isAgent, userName, this);
+                    UserList.addUser(userIn);
                     continue;
                 }
 
 
-                if (user.getWaitingConnection() && !user.getIsConnected() && word.equals("/ready")){
-                    user.setWaitingConnection(true);
+                if (!userIn.getWaitingConnection() && !userIn.getIsConnected() && word.equals("/r")){
+                    userIn.setWaitingConnection(true);
                     continue;
                 }
-
-
 
 
                 if ( word.equals("/l")){
-                    if (user.getIsConnected()){
-                        outToConnected.write(word + "\n");
-                        outToConnected.flush();
-                        user.unconnectedUsers(user.getConnectUser());
+                    if (userIn.getIsConnected()){
+                        this.unconnectedUsers();
                     }
-                    user.setWaitingConnection(false);
                 }
 
 
                 if (word.equals("/e")){
-                    if (user.getIsConnected()){
-                        outToConnected.write(word + "\n");
-                        outToConnected.flush();
-                        user.unconnectedUsers(user.getConnectUser());
+                    if (userOut != null){
+                        this.unconnectedUsers();
                     }
-
-
-                    UserList.dellUser(user);
+                    UserList.dellUser(userIn);
                     break;
                 }
 
-                if (user.getIsConnected()){
+
+                if (userIn.getIsConnected() && !word.equals("/r")){
                     Date time = new Date(); // текущая дата
                     SimpleDateFormat dt1 = new SimpleDateFormat("HH:mm:ss"); // берем только время до секунд
                     String dtime = dt1.format(time); // время
-                    outToConnected.write("(" + dtime + ") " + user.getUserName() + ": " + word + "\n"); // отправляем на сервер
-                    outToConnected.flush();
+                    userOut.getUserSocket().out.write("(" + dtime + ") " + userIn.getUserName() + ": " + word + "\n"); // отправляем на сервер
+                    userOut.getUserSocket().out.flush();
                 }
-
-
-
 
 
             }
@@ -141,7 +184,8 @@ public class UserSocket extends Thread {
 
         } catch (IOException e) {
             logger.error(e + " in thread User.");
-            UserList.dellUser(user);
+            this.unconnectedUsers();
+            UserList.dellUser(userIn);
             this.closeSocket();
         }
     }

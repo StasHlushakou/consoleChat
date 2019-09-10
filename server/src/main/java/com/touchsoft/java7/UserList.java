@@ -53,7 +53,7 @@ public class UserList extends Thread {
                 if (!(userClient.getIsConnected()) && userClient.getWaitingConnection()) {
                     for (User userAgent : agentList) {
                         if ((!userAgent.getIsConnected()) && userAgent.getWaitingConnection()) {
-                            userClient.connectUsers(userAgent);
+                            UserSocket.connectUsers(userClient,userAgent);
                             break;
                         }
                     }

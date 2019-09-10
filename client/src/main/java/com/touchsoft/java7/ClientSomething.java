@@ -6,7 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class ClientSomthing {
+public class ClientSomething {
 
     private String          addr; // ip адрес клиента
     private int             port; // порт соединения
@@ -15,15 +15,16 @@ public class ClientSomthing {
     private BufferedWriter  out; // поток чтения в сокет
     private BufferedReader  inputUser; // поток чтения с консоли
 
-    private String          name; // имя клиента
 
-    private boolean isConected;     //
+    private boolean isConnected;     //
+    private boolean isRegistration;
+
 
     public static ArrayList<String> messagesBuffer; //буфер сообщений пользователя
 
 
 
-    public ClientSomthing(String addr, int port) {
+    public ClientSomething(String addr, int port) {
         this.addr = addr;
         this.port = port;
         try {
@@ -37,7 +38,7 @@ public class ClientSomthing {
             new ReadMsg().start(); // нить читающая сообщения из сокета в бесконечном цикле
             new WriteMsg().start(); // нить пишущая сообщения в сокет приходящие с консоли в бесконечном цикле
         } catch (IOException e) {
-            ClientSomthing.this.downService();
+            ClientSomething.this.downService();
             System.out.println("Exception in constructor ClientSomthing");
         }
 
@@ -61,7 +62,7 @@ public class ClientSomthing {
                     out.flush();
                     break; // выходим из цикла если верно введён тип пользователя
                 }else {
-                    continue; // в противном случае повторяем вопро про тип клиента
+                    continue; // в противном случае повторяем вопрос про тип клиента
                 }
             } catch (IOException e){
                 System.out.println(e);
@@ -70,17 +71,19 @@ public class ClientSomthing {
 
         System.out.print("Enter your name: ");
         try {
-            name = inputUser.readLine();
+            String name = inputUser.readLine();
             out.write(name + "\n");
             out.flush();
 
-            out.write("/ready" + "\n");
-           out.flush();
+            out.write("/r" + "\n");
+            out.flush();
         } catch (IOException ignored) { }
 
         messagesBuffer = new ArrayList<>();
 
     }
+
+
 
     private void downService() {
         try {
@@ -109,16 +112,23 @@ public class ClientSomthing {
                     }
 
 
-                    if (str.equals("isConnected")){
-                        isConected = true;
+                    if (str.equals("/c")){
+                        isConnected = true;
                         System.out.println("Соединение создано");
+                        if (!messagesBuffer.isEmpty()){
+                            for (String message : messagesBuffer){
+                                out.write(message + "\n");
+                                out.flush();
+                            }
+                            messagesBuffer.clear();
+                        }
                         continue;
                     }
 
-                    if (str.equals("exit") || str.equals("leave")) {
+                    if (str.equals("/l")) {
                         System.out.println("Собеседник покинул чат, ожидайте одключения к другому собеседнику");
-                        isConected = false;
-                        out.write("ready" + "\n");
+                        isConnected = false;
+                        out.write("/r" + "\n");
                         out.flush();
                     } else {
                         System.out.println(str); // пишем сообщение с сервера на консоль
@@ -126,7 +136,7 @@ public class ClientSomthing {
 
                 }
             } catch (IOException e) {
-                ClientSomthing.this.downService();
+                ClientSomething.this.downService();
             }
         }
     }
@@ -144,51 +154,45 @@ public class ClientSomthing {
                 while (true) {
                     String userWord = inputUser.readLine(); // сообщения с консоли
 
-                    if (!isConected){
 
-                        /*if (inputUser.equals("exit")){
-                            out.write("exit" + "\n");
+                    if (userWord.equals("/e")) {
+                        out.write(userWord + "\n");
+                        out.flush(); // чистим
+                        break;
+                    }
+
+
+                    if (!isConnected){
+                        if (userWord.equals("/e")){
+                            out.write(userWord + "\n");
                             out.flush();
                             break;
-                        }*/
-
+                        }
                         messagesBuffer.add(userWord);
-                        out.write("ready" + "\n");
+                        out.write("/r" + "\n");
                         out.flush();
                         continue;
                     }
 
 
-                    if (!messagesBuffer.isEmpty()){
-                        for (String message : messagesBuffer){
-                            out.write(message + "\n");
-                            out.flush();
-                        }
-                        messagesBuffer.clear();
-                    }
 
 
-                    if (userWord.equals("exit")) {
-                        out.write("exit" + "\n");
+
+
+                    if(userWord.equals("/l")){
+                        out.write(userWord + "\n");
                         out.flush(); // чистим
-                        break;
-                    } else if(userWord.equals("leave")){
-                        out.write("leave" + "\n");
-                        out.flush(); // чистим
-                        /*out.write("ready" + "\n");
-                        out.flush();*/
-                        isConected = false;
-
+                        isConnected = false;
                     }else {
                         out.write(userWord + "\n"); // отправляем на сервер
                         out.flush();
                     }
 
                 }
-                ClientSomthing.this.downService(); // харакири
+                ClientSomething.this.downService(); // харакири
 
             } catch (IOException e) {
-                ClientSomthing.this.downService(); // в случае исключения тоже харакири
+                ClientSomething.this.downService(); // в случае исключения тоже харакири
 
             }
         }
