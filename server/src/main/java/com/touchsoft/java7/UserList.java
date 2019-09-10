@@ -7,21 +7,21 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 public class UserList extends Thread {
-    final static Logger logger = Logger.getLogger(UserList.class);
+    private static Logger logger = Logger.getLogger(UserList.class);
 
     private static ArrayList<User> clientList;
     private static ArrayList<User> agentList;
 
 
     // Создаёт нового пользователя и добавляет его в нужную коллекцию
-    public void addUser(Socket userSocket){
-        User user = new User(userSocket);
+    public static void addUser(User user){
+
         if (user.getIsAgent()){
             agentList.add(user);
         } else {
             clientList.add(user);
         }
-        logger.info("Create " + user.getUserName() + " and add to List");
+        logger.info(user.getUserName() + " and add to List");
     }
 
     // Удаляет пользователя из нужной коллекции

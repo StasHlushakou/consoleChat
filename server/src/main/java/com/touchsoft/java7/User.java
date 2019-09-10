@@ -8,76 +8,82 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 
-public class User extends Thread {
+public class User /*extends Thread*/ {
 
-    final static Logger logger = Logger.getLogger(User.class);
+    private static Logger logger = Logger.getLogger(User.class);
 
     //инициализируются конструктором
-
+    private String userName;            //имя пользователя
     private Boolean isAgent;            //флаг агент
     private Boolean isConnected;        //флаг соединентя
     private Boolean waitingConnection;  //флаг ожидания подключения
 
-    private Socket userSocket;          //сокет
-    private String userName;            //имя пользователя
-
-    private BufferedReader in;          //буфер ввода сообщений от пользователля
-    private BufferedWriter out;         //буфер вывода сообщений другому пользователю
-
     private User connectUser;           //соединённый пользователь
-
+    private UserSocket userSocket;
 
 //----------------------------------------------------------------------------------------------------------------------
+    // геттер userName
+    public String getUserName (){
+        return userName;
+    }
+    // сеттер userName
+    public void setUserName(String userName){
+        this.userName = userName;
+    }
+
 
     // геттер isAgent
     public Boolean getIsAgent(){
         return isAgent;
     }
-
     // сеттер isAgent
     public void setIsAgent(boolean isAgent){
         this.isAgent = isAgent;
     }
 
-    // геттер getIsConect
+
+    // геттер isConnected
     public Boolean getIsConnected(){
         return isConnected;
     }
+    // сеттер isConnected
+    public void setIsConnected(boolean isConnected){
+        this.isConnected = isConnected;
+    }
+
 
     // геттер waitingConnection
     public  Boolean getWaitingConnection () {
         return waitingConnection;
     }
-
-    // геттер имени
-    public String getUserName (){
-        return userName;
+    // сеттер waitingConnection
+    public void setWaitingConnection(boolean waitingConnection){
+        this.waitingConnection = waitingConnection;
     }
+
+
+    // геттер connectUser
+    public  User getConnectUser () {
+        return connectUser;
+    }
+    // сеттер waitingConnection
+    public void setonnectUser(User connectUser){
+        this.connectUser = connectUser;
+    }
+//----------------------------------------------------------------------------------------------------------------------
+
 
 
     //конструктор User, получает на вход сокет, инициализирует имя и класс пользователя,
     // запускает нить, слушающую сообщения от пользователя
-    public User(Socket userSocket){
+    public User(Boolean isAgent, String userName, UserSocket userSocket){
+
+        this.isAgent = isAgent;
+        this.userName = userName;
+        this.isConnected = false;
+        this.waitingConnection = true;
         this.userSocket = userSocket;
 
-        try {
-            this.in = new BufferedReader(new InputStreamReader(this.userSocket.getInputStream()));
-            String word = in.readLine();
-            if (word.equals("agent")){
-                isAgent = true;
-            } else {
-                isAgent = false;
-            }
-
-            word = in.readLine();
-            userName = word;
-            this.isConnected = false;
-            this.waitingConnection = true;
-            start();
-
-        } catch (IOException e){
-            logger.error(e + " in constructor User.");
-        }
         logger.info("Create User " + this.getUserName());
 
     }
@@ -85,7 +91,14 @@ public class User extends Thread {
 
     //создание чата двух пользователей(настройка выводных потоков,установка флага соединения и ссылки на связанного пользователя)
     public void connectUsers(User user){
+
+        userSocket.setOutToConnected(user.userSocket);
+        connectUser.userSocket.setOutToConnected(userSocket);
+
         try{
+            userSocket.
+
+
             this.out = new BufferedWriter(new OutputStreamWriter(user.userSocket.getOutputStream()));
             user.out = new BufferedWriter(new OutputStreamWriter(this.userSocket.getOutputStream()));
 
@@ -98,6 +111,7 @@ public class User extends Thread {
             this.out.write("isConnected" + "\n");
             this.out.flush();
 
+
             user.isConnected = true;
             this.isConnected = true;
 
@@ -107,6 +121,7 @@ public class User extends Thread {
         } catch (IOException e){
             logger.error(e + " in connectUsers.");
         }
+
 
         logger.info("Connect User " + this.getUserName() + " with " + user.getUserName());
 
@@ -124,50 +139,10 @@ public class User extends Thread {
         user.waitingConnection = false;
         this.waitingConnection = false;
 
+
         logger.info("unconnectedUsers " + this.getUserName() + " with" + user.getUserName());
 
     }
 
-
-    @Override
-    public void run() {
-        //logger.info("Start thread User");
-        try {
-            while (true) {
-
-                String word = in.readLine();
-                if (word == null){
-                    continue;
-                }
-
-                if (!this.waitingConnection && !this.isConnected && word.equals("ready")){
-                    this.waitingConnection = true;
-                    continue;
-                }
-
-                //разрушение связи при отключении одного из абонентов
-                if (word.equals("leave")) {
-                    out.write(word + "\n");
-                    out.flush();
-                    this.unconnectedUsers(connectUser);
-                } else if (word.equals("exit")){
-                    out.write(word + "\n");
-                    out.flush();
-                    this.unconnectedUsers(connectUser);
-                    UserList.dellUser(this);
-                    break;
-                } else {
-                    Date time = new Date(); // текущая дата
-                    SimpleDateFormat dt1 = new SimpleDateFormat("HH:mm:ss"); // берем только время до секунд
-                    String dtime = dt1.format(time); // время
-                    out.write("(" + dtime + ") " + userName + ": " + word + "\n"); // отправляем на сервер
-                    out.flush();
-                }
-
-            }
-        } catch (IOException e) {
-            logger.error(e + " in thread User.");
-        }
-    }
 
 }

@@ -28,20 +28,17 @@ public class ClientSomthing {
         this.port = port;
         try {
             this.socket = new Socket(addr, port);
-        } catch (IOException e) {
-            System.err.println("Socket failed");
-        }
-        try {
             inputUser = new BufferedReader(new InputStreamReader(System.in));
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+
             registrationUser();
 
             new ReadMsg().start(); // нить читающая сообщения из сокета в бесконечном цикле
             new WriteMsg().start(); // нить пишущая сообщения в сокет приходящие с консоли в бесконечном цикле
         } catch (IOException e) {
             ClientSomthing.this.downService();
-            System.out.println("исключение в конструкторе пользователя");
+            System.out.println("Exception in constructor ClientSomthing");
         }
 
     }
@@ -50,17 +47,21 @@ public class ClientSomthing {
 
     public void registrationUser () {
 
-        System.out.println("Are you an agent or client?");
+
         while (true) {
+            System.out.println("Are you agent('a') or client('c')?");
             String userWord;
             try {
-                userWord = inputUser.readLine(); // сообщения с консоли
-                if (userWord.equals("agent") || userWord.equals("client")) {
+                userWord = inputUser.readLine();
+
+                if (userWord.equals("a") || userWord.equals("c")) {
+                    out.write("/reg" + "\n");
+                    out.flush();
                     out.write(userWord + "\n");
                     out.flush();
                     break; // выходим из цикла если верно введён тип пользователя
-                } else {
-                    System.out.println("Are you an agent or client?");
+                }else {
+                    continue; // в противном случае повторяем вопро про тип клиента
                 }
             } catch (IOException e){
                 System.out.println(e);
@@ -73,9 +74,8 @@ public class ClientSomthing {
             out.write(name + "\n");
             out.flush();
 
-
-/*            out.write("ready" + "\n");
-           out.flush();*/
+            out.write("/ready" + "\n");
+           out.flush();
         } catch (IOException ignored) { }
 
         messagesBuffer = new ArrayList<>();
