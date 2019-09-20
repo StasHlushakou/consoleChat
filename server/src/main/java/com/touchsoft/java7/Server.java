@@ -5,7 +5,7 @@ import java.net.*;
 import org.apache.log4j.*;
 
 public class Server {
-    private static Logger logger = Logger.getLogger(Server.class);
+    private static final Logger logger = Logger.getLogger(Server.class);
 
     public static void main(String[] args) {
 
@@ -16,10 +16,6 @@ public class Server {
             while (true){
                 Socket clientSocket = server.accept();
                 UserSocket userSocket = new UserSocket(clientSocket);
-
-                //logger.info("New socked detected");
-
-                //userList.addUser(clientSocket);
             }
         } catch (IOException e) {
             logger.error(e + " Server.");

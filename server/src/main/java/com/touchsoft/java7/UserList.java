@@ -1,13 +1,11 @@
 package com.touchsoft.java7;
 
 
-import org.apache.log4j.Logger;
-
-import java.net.Socket;
+import org.apache.log4j.*;
 import java.util.ArrayList;
 
 public class UserList extends Thread {
-    private static Logger logger = Logger.getLogger(UserList.class);
+    private static final Logger logger = Logger.getLogger(UserList.class);
 
     private static ArrayList<User> clientList;
     private static ArrayList<User> agentList;
@@ -38,7 +36,6 @@ public class UserList extends Thread {
     public UserList(){
         clientList = new ArrayList<>();
         agentList = new ArrayList<>();
-        //logger.info("Create UserList");
         start();
     }
 

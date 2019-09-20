@@ -1,13 +1,12 @@
 package com.touchsoft.java7;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.*;
 
-import java.net.Socket;
 
 
 public class User {
 
-    private static Logger logger = Logger.getLogger(User.class);
+    private static final Logger logger = Logger.getLogger(User.class);
 
     //инициализируются конструктором
     private String userName;            //имя пользователя

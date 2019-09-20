@@ -8,7 +8,13 @@
         <outputRelativeToContentRoot value="true" />
         <module name="client" />
         <module name="server" />
+        <module name="ServerWeb" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="serverWeb" target="1.7" />
+      <module name="ServerWeb" target="1.7" />
+      <module name="webChat" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>
