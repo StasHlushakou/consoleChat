@@ -2,31 +2,23 @@ package com.touchsoft.java7;
 
 import java.io.*;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.LinkedList;
+import org.apache.log4j.*;
 
 public class Server {
-
+    private static final Logger logger = Logger.getLogger(Server.class);
 
     public static void main(String[] args) {
-        CreateConnection connection = new CreateConnection();
-        try {
-            try  (ServerSocket server = new ServerSocket(4044)){
-                System.out.println("Сервер запущен!");
 
+        try (ServerSocket server = new ServerSocket(4045)){
+            logger.info("Started server");
+            UserList userList = new UserList();
 
-                while (true){
-                    Socket clientSocket = server.accept();
-                    User user = new User(clientSocket);
-                    if (user.getIsAgent()){
-                        connection.addAgent(user);
-                    } else {
-                        connection.addClient(user);
-                    }
-                }
+            while (true){
+                Socket clientSocket = server.accept();
+                UserSocket userSocket = new UserSocket(clientSocket);
             }
         } catch (IOException e) {
-            System.err.println(e);
+            logger.error(e + " Server.");
         }
     }
 }

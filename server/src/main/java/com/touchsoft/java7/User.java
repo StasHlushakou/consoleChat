@@ -1,149 +1,78 @@
 package com.touchsoft.java7;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import org.apache.log4j.*;
 
 
-public class User extends Thread{
+
+public class User {
+
+    private static final Logger logger = Logger.getLogger(User.class);
 
     //инициализируются конструктором
-    private BufferedReader in;      //буфер ввода сообщений от пользователля
-    private Socket userSocket;      //сокет
-    private Boolean isAgent;        //флаг агент
-    private String userName;        //имя пользователя
+    private String userName;            //имя пользователя
+    private Boolean isAgent;            //флаг агент
+    private Boolean isConnected;        //флаг соединентя
+    private Boolean waitingConnection;  //флаг ожидания подключения
 
-    //инициализируются в ходе работы
-    private BufferedWriter out;     //буфер отправки сообщений связанному пользователю
-    private Boolean isConect;       //флаг соединентя
-    private User connectUser;       //ссылка на связанного пользователя
 
-    public static ArrayList<String> messagesBufer; //буфер сообщений пользователя
+    private UserSocket userSocket;           //сокет, следящий за сообщениями от данного пользователя
+
 
 
 //----------------------------------------------------------------------------------------------------------------------
+    // геттер userName
+    public String getUserName (){
+        return userName;
+    }
 
-    //геттер isAgent
+
+    // геттер isAgent
     public Boolean getIsAgent(){
         return isAgent;
     }
 
-    //геттер getIsConect
-    public Boolean getIsConect(){
-        return isConect;
+
+    // геттер isConnected
+    public Boolean getIsConnected(){
+        return isConnected;
+    }
+    // сеттер isConnected
+    public void setIsConnected(boolean isConnected){
+        this.isConnected = isConnected;
     }
 
-    //геттер in
-    public BufferedReader getIn(){
-        return in;
+
+    // геттер waitingConnection
+    public  Boolean getWaitingConnection () {
+        return waitingConnection;
+    }
+    // сеттер waitingConnection
+    public void setWaitingConnection(boolean waitingConnection){
+        this.waitingConnection = waitingConnection;
     }
 
-    //геттер out
-    public BufferedWriter getOut(){
-        return out;
-    }
 
-    //геттер connectUser
-    public User getConnectUser(){
-        return connectUser;
+    // геттер userSocket
+    public  UserSocket getUserSocket () {
+        return userSocket;
     }
+    // сеттер userSocket
 
-    //конструктор User, получает на вход сокет, инициализирует имя и класс пользователя, запускает нить
-    public User(Socket userSocket){
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+    //конструктор User, получает на вход сокет, инициализирует имя и класс пользователя,
+    public User(Boolean isAgent, String userName, UserSocket userSocket){
+
         this.userSocket = userSocket;
-        try{
-            this.in = new BufferedReader(new InputStreamReader(this.userSocket.getInputStream()));
-            String word = in.readLine();
-            if (word.equals("agent")){
-                isAgent = true;
-            } else {
-                isAgent = false;
-            }
+        this.userName = userName;
+        this.isAgent = isAgent;
+        this.isConnected = false;
+        this.waitingConnection = true;
 
-            word = in.readLine();
-            userName = word;
-        } catch (IOException e){
-            System.out.println(e);
-        }
-        this.messagesBufer = new ArrayList<>();
-        this.isConect = false;
-        start();
+        logger.info("Create User " + this.getUserName());
     }
 
-
-    //создание чата двух пользователей(настройка выводных потоков,установка флага соединения и ссылки на связанного пользователя)
-    public void connectUsers(User user){
-        try{
-            user.out = new BufferedWriter(new OutputStreamWriter(this.userSocket.getOutputStream()));
-            this.out = new BufferedWriter(new OutputStreamWriter(user.userSocket.getOutputStream()));
-        } catch (IOException e){
-            System.out.println(e);
-        }
-
-        user.isConect = true;
-        this.isConect = true;
-
-        user.connectUser = this;
-        this.connectUser = user;
-
-
-
-    }
-
-    //разъединение чата двух пользователей (отключение выводных потоков, сброс флага соединения и ссылки на связанного пользователя)
-    private void unconnectUsers(User user){
-        user.out = null;
-        user.isConect = false;
-        user.connectUser = null;
-        this.out = null;
-        this.isConect = false;
-        this.connectUser = null;
-
-    }
-
-
-
-
-
-    @Override
-    public void run() {
-        try {
-            while (true) {
-                String word ;
-                while (true){
-                    word = getIn().readLine();
-                    if (word != null){
-                        break;
-                    }
-                }
-                // занесение в буфер сообщений, пока пользователь не подключён к другому пользователю
-                // и очистка буфера при подключении
-                if (!isConect && !isAgent){
-                    messagesBufer.add(word);
-                    continue;
-                } else if (!messagesBufer.isEmpty() && !isAgent) {
-                    for (String str : messagesBufer){
-                        getOut().write(str + "\n");
-                        messagesBufer.remove(str);
-                    }
-                }
-
-                //разрушение связи при отключении одного из абонентов
-                if (word.equals("leave") || word.equals("exit")) {
-                    getOut().write(word + "\n");
-                    getOut().flush();
-                    this.unconnectUsers(connectUser);
-                } else {
-                    getOut().write(word + "\n");
-                    getOut().flush();
-                }
-
-                if (word.equals("exit")) {
-                    break;
-                }
-            }
-        } catch (IOException e) {
-            System.err.println(e);
-        }
-    }
 }

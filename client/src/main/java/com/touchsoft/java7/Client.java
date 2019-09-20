@@ -9,11 +9,11 @@ import java.util.Date;
 public class Client {
 
     public static String ipAddr = "localhost";
-    public static int port = 4044;
+    public static int port = 4045;
 
 
     public static void main(String[] args) {
-        new ClientSomthing(ipAddr, port);
+        new ClientSomething(ipAddr, port);
     }
 
 }
