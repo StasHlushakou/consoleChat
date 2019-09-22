@@ -25,7 +25,15 @@ public class UserSocket extends Thread {
     Matcher matcher ;
 
 
+    private void sendMsg(String msg){
+        try {
+            this.out.write(msg + "\n");
+            this.out.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
+    }
 
 
     public UserSocket (Socket userSocket){
@@ -35,8 +43,7 @@ public class UserSocket extends Thread {
             this.in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
             this.out = new BufferedWriter(new OutputStreamWriter(this.socket.getOutputStream()));
 
-            this.out.write("From registration enter '/reg [a/c] name'" + "\n");
-            this.out.flush();
+            this.sendMsg("From registration enter '/reg [a/c] name'" );
         } catch (IOException e){
             logger.error(e + " in constructor.");
         }
@@ -46,47 +53,27 @@ public class UserSocket extends Thread {
 
     //создание чата двух пользователей(настройка выводных потоков,установка флага соединения и ссылки на связанного пользователя)
     public static void connectUsers(User user1, User user2){
-
         user1.getUserSocket().userOut = user2;
         user2.getUserSocket().userOut = user1;
+        user1.getUserSocket().sendMsg("You are connected to " + user2.getUserName());
+        user2.getUserSocket().sendMsg("You are connected to " + user1.getUserName());
 
-
-        try{
-
-            user1.getUserSocket().out.write("You are connected to " + user2.getUserName() + "\n");
-            user1.getUserSocket().out.flush();
-
-            user2.getUserSocket().out.write("You are connected to " + user1.getUserName() + "\n");
-            user2.getUserSocket().out.flush();
-
-
-            if (!user1.getUserSocket().msgList.isEmpty()){
-                for(String s : user1.getUserSocket().msgList){
-                    user2.getUserSocket().out.write(s);
-                    user2.getUserSocket().out.flush();
-                }
-                user1.getUserSocket().msgList.clear();
+        if (!user1.getUserSocket().msgList.isEmpty()){
+            for(String s : user1.getUserSocket().msgList){
+                user2.getUserSocket().sendMsg(s);
             }
-
-            if (!user2.getUserSocket().msgList.isEmpty()){
-                for(String s : user2.getUserSocket().msgList){
-                    user1.getUserSocket().out.write(s);
-                    user1.getUserSocket().out.flush();
-                }
-                user2.getUserSocket().msgList.clear();
-            }
-
-
-            user1.setIsConnected(true);
-            user2.setIsConnected(true);
-
-            user1.setWaitingConnection(false);
-            user2.setWaitingConnection(false);
-
-        } catch (IOException e){
-            logger.error(e + " in connectUsers.");
+            user1.getUserSocket().msgList.clear();
         }
-
+        if (!user2.getUserSocket().msgList.isEmpty()){
+            for(String s : user2.getUserSocket().msgList){
+                user1.getUserSocket().sendMsg(s);
+            }
+            user2.getUserSocket().msgList.clear();
+        }
+        user1.setIsConnected(true);
+        user2.setIsConnected(true);
+        user1.setWaitingConnection(false);
+        user2.setWaitingConnection(false);
         logger.info("Connect User " + user1.getUserName() + " with " + user2.getUserName());
 
     }
@@ -94,17 +81,10 @@ public class UserSocket extends Thread {
     //разъединение чата двух пользователей (отключение выводных потоков, сброс флага соединения и ссылки на связанного пользователя)
     public void unconnectedUsers(){
 
-
-        try {
-            userOut.getUserSocket().out.write(userOut.getUserName() + " left the chat " + "\n");
-            userOut.getUserSocket().out.flush();
-            userOut.getUserSocket().out.write(" Please wait for connection " + "\n");
-            userOut.getUserSocket().out.flush();
-        } catch (IOException e){
-            logger.error(e + " in unconnectedUsers.");
-        }
-
         logger.info("Unconnected users " + userIn.getUserName() + " with" + userOut.getUserName());
+
+        userOut.getUserSocket().sendMsg(userOut.getUserName() + " left the chat ");
+        userOut.getUserSocket().sendMsg(" Please wait for connection ");
 
         userIn.setIsConnected(false);
         userOut.setIsConnected(false);
@@ -112,9 +92,10 @@ public class UserSocket extends Thread {
         userIn.setWaitingConnection(false);
         userOut.setWaitingConnection(true);
 
-
         userOut.getUserSocket().userOut = null;
         userOut = null;
+
+
     }
 
     private void closeSocket(){
@@ -137,13 +118,10 @@ public class UserSocket extends Thread {
         //logger.info("Start thread");
         try {
             while (true) {
-
                 String word = in.readLine();
                 if (word == null){
                     continue;
                 }
-
-
 
                 if (userIn == null){
                     matcher = pattern.matcher(word);
@@ -161,29 +139,18 @@ public class UserSocket extends Thread {
                         userIn = new User(isAgent, userName, this);
                         UserList.addUser(userIn);
                         msgList = new ArrayList<>();
-
-                        out.write("You are registered as " + userIn.getUserName() + "\n");
-                        out.flush();
-
+                        this.sendMsg("You are registered as " + userIn.getUserName());
                         continue;
                     }
                 }
-
-
-
-
-
-
 
                 if ( word.equals("/l")){
                     if (userIn.getIsConnected()){
                         this.unconnectedUsers();
                     }
-                    out.write("You left the chat " + "\n");
-                    out.flush();
+                    this.sendMsg("You left the chat ");
                     continue;
                 }
-
 
                 if (word.equals("/e")){
                     if (userOut != null){
@@ -193,14 +160,12 @@ public class UserSocket extends Thread {
                     break;
                 }
 
-
-
                 if (!userIn.getIsConnected()){
 
                     Date time = new Date(); // текущая дата
                     SimpleDateFormat dt1 = new SimpleDateFormat("HH:mm:ss"); // берем только время до секунд
                     String dtime = dt1.format(time); // время
-                    msgList.add("(" + dtime + ") " + userIn.getUserName() + ": " + word + "\n");
+                    msgList.add("(" + dtime + ") " + userIn.getUserName() + ": " + word);
 
                     userIn.setWaitingConnection(true);
                     continue;
@@ -210,11 +175,8 @@ public class UserSocket extends Thread {
                     Date time = new Date(); // текущая дата
                     SimpleDateFormat dt1 = new SimpleDateFormat("HH:mm:ss"); // берем только время до секунд
                     String dtime = dt1.format(time); // время
-                    userOut.getUserSocket().out.write("(" + dtime + ") " + userIn.getUserName() + ": " + word + "\n"); // отправляем на сервер
-                    userOut.getUserSocket().out.flush();
+                    userOut.getUserSocket().sendMsg("(" + dtime + ") " + userIn.getUserName() + ": " + word);
                 }
-
-
             }
 
             //Бллок очистки ресурсов при выходе из потока
