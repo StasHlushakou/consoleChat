@@ -37,8 +37,6 @@ public class ClientSomething {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 
-            //registrationUser();
-
             new ReadMsg().start(); // нить читающая сообщения из сокета в бесконечном цикле
             new WriteMsg().start(); // нить пишущая сообщения в сокет приходящие с консоли в бесконечном цикле
         } catch (IOException e) {

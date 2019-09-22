@@ -39,6 +39,13 @@ public class UserList extends Thread {
         start();
     }
 
+    public static ArrayList<User> userInListReturn(){
+        ArrayList<User> al = new ArrayList<>();
+        al.addAll(clientList);
+        al.addAll(agentList);
+        return al;
+    }
+
 
     @Override
     public void run(){
