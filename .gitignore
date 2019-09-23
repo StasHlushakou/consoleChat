@@ -121,3 +121,5 @@ buildNumber.properties
 
 # End of https://www.gitignore.io/api/java,maven,intellij
 /.idea/
+/.editorconfig
+!/README.md

@@ -1,19 +1,19 @@
 package com.touchsoft.java7;
 
-
 import org.apache.log4j.*;
-import java.util.ArrayList;
+import java.util.ArrayList;//
 
+// Class for storing users, and connecting free users
 public class UserList extends Thread {
+
     private static final Logger logger = Logger.getLogger(UserList.class);
 
     private static ArrayList<User> clientList;
     private static ArrayList<User> agentList;
 
 
-    // Создаёт нового пользователя и добавляет его в нужную коллекцию
+    // Create new user and add them to collection
     public static void addUser(User user){
-
         if (user.getIsAgent()){
             agentList.add(user);
         } else {
@@ -22,7 +22,7 @@ public class UserList extends Thread {
         logger.info(user.getUserName() + " and add to List");
     }
 
-    // Удаляет пользователя из нужной коллекции
+    // Dell user from collection
     public static void dellUser(User user){
         if (user.getIsAgent()){
             agentList.remove(user);
@@ -32,13 +32,14 @@ public class UserList extends Thread {
         logger.info("dellUser " + user.getUserName());
     }
 
-    // Конструктор, инициализирует коллекции и запускает нить проверки пользователей, готовых к подключению
+    // Initial collection and starting thread
     public UserList(){
         clientList = new ArrayList<>();
         agentList = new ArrayList<>();
         start();
     }
 
+    // Return all users
     public static ArrayList<User> userInListReturn(){
         ArrayList<User> al = new ArrayList<>();
         al.addAll(clientList);
@@ -46,13 +47,11 @@ public class UserList extends Thread {
         return al;
     }
 
-
+    // Thread for searching and connecting users who are waiting for a connection
     @Override
     public void run(){
-        //logger.info("Start thread UserList");
 
         while (true) {
-
             for (User userClient : clientList) {
                 if (!(userClient.getIsConnected()) && userClient.getWaitingConnection()) {
                     for (User userAgent : agentList) {
