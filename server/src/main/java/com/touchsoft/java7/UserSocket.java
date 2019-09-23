@@ -82,7 +82,7 @@ public class UserSocket extends Thread {
         logger.info("Unconnected users " + userIn.getUserName() + " with" + userOut.getUserName());
 
         userOut.getUserSocket().sendMsg(userOut.getUserName() + " left the chat ");
-        userOut.getUserSocket().sendMsg(" Please wait for connection ");
+        userOut.getUserSocket().sendMsg("Please wait for connection ");
         userIn.setIsConnected(false);
         userOut.setIsConnected(false);
         userIn.setWaitingConnection(false);

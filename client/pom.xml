@@ -54,7 +54,7 @@
                         <archive>
                             <manifest>
                                 <addClasspath>true</addClasspath>
-                                <mainClass>com.touchsoft.java7.Server</mainClass>
+                                <mainClass>com.touchsoft.java7.Client</mainClass>
                                 <packageName>com.touchsoft.java7</packageName>
                                 <addClasspath>true</addClasspath>
                                 <classpathPrefix>lib/</classpathPrefix>
