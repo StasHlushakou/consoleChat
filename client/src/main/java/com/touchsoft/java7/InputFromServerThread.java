@@ -4,7 +4,7 @@ import java.io.IOException;
 
 public class InputFromServerThread extends Thread{
 
-    ClientSocketProperties csp;
+    private ClientSocketProperties csp;
 
     public InputFromServerThread(ClientSocketProperties csp) {
         this.csp = csp;
@@ -29,9 +29,7 @@ public class InputFromServerThread extends Thread{
                 }
                 sleep(100);
             }
-        } catch (IOException e) {
-            csp.setStopClient(true);
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             csp.setStopClient(true);
         }
     }

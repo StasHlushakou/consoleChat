@@ -12,12 +12,12 @@ public class Server {
     public static void main(String[] args) {
         try (ServerSocket server = new ServerSocket(4045)){
             logger.info("Server start");
-            UserList userList = new UserList();
+            new UserList();
 
             // Clients wait loop
             while (true){
                 Socket clientSocket = server.accept();
-                UserSocket userSocket = new UserSocket(clientSocket);
+                new UserSocket(clientSocket);
             }
         } catch (IOException e) {
             logger.error(e + " in Server.");

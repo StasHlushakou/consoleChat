@@ -20,7 +20,7 @@ public class ClientSocketProperties {
         while (this.socket == null){
             try {
                 this.socket = new Socket(addr, port);
-            }catch (IOException e){            }
+            }catch (IOException e){}
         }
 
         // Creating I/O-stream

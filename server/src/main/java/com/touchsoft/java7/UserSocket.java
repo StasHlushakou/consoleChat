@@ -21,8 +21,8 @@ public class UserSocket extends Thread {
     private User userOut;
     private ArrayList<String> msgList;
 
-    Pattern pattern = Pattern.compile("/reg\\s[ac]\\s.+");
-    Matcher matcher ;
+    private Pattern pattern = Pattern.compile("/reg\\s[ac]\\s.+");
+    private Matcher matcher ;
 
     // Method for sending a message
     private void sendMsg(String msg){
@@ -137,12 +137,8 @@ public class UserSocket extends Thread {
                         this.sendMsg("From registration enter '/reg [a/c] name'");
                         continue;
                     }else {
-                        Boolean isAgent;
-                        if (word.substring(5,6).equals("a")){
-                            isAgent = true;
-                        } else {
-                            isAgent = false;
-                        }
+                        boolean isAgent = word.substring(5,6).equals("a");
+
                         String userName = word.substring(7);
                         userIn = new User(isAgent, userName, this);
                         UserList.addUser(userIn);

@@ -5,12 +5,12 @@ import java.io.IOException;
 // Start client class
 public class Client {
 
-    public static String ipAddr = "localhost";
-    public static int port = 4045;
+    private static String ipAddress = "localhost";
+    private static int port = 4045;
 
     //Start console client
     public static void main(String[] args) {
-        ClientSocketProperties csp = new ClientSocketProperties(ipAddr, port);
+        ClientSocketProperties csp = new ClientSocketProperties(ipAddress, port);
 
         try {
             // Reading cycle of messages from the console and sending them to the server
