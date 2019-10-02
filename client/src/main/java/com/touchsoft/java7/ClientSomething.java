@@ -5,6 +5,8 @@ import java.net.Socket;
 
 // Class from reading and writing user msg
 public class ClientSomething {
+    //Excessive merging of classes into one class.
+    //It is recommended to break a class into separate classes.
 
     private Socket          socket;
     private BufferedReader  in;
@@ -29,9 +31,11 @@ public class ClientSomething {
             out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 
             // Starting threads
+            //There is no thread management. Their life cycle can only be interrupted if excluded.
             new ReadMsg().start();
             new WriteMsg().start();
         } catch (IOException e) {
+//            Not all exceptions are tracked.
             ClientSomething.this.downService();
             System.out.println("Exception in constructor ClientSomthing");
         }

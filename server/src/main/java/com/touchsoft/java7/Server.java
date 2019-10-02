@@ -12,11 +12,13 @@ public class Server {
     public static void main(String[] args) {
         try (ServerSocket server = new ServerSocket(4045)){
             logger.info("Started server");
+            //Excessive assignment of an object to a variable that is not used
             UserList userList = new UserList();
 
             // Clients wait loop
             while (true){
                 Socket clientSocket = server.accept();
+                //Excessive assignment of an object to a variable that is not used
                 UserSocket userSocket = new UserSocket(clientSocket);
             }
         } catch (IOException e) {

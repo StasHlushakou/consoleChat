@@ -1,0 +1,10 @@
+Jar-file is built, but does not start due to the lack of the log4j library in it.
+It is recommended to use the maven-shade plugin for embedding third-party libraries in the jar.
+
+The application uses multithreading.
+Use of thread safe collections is recommended.
+
+There is no instantiation of user objects when logging.
+
+There is no way to leave the application before establishing a connection.
+An exception is thrown during forced disconnection (closing the application).
