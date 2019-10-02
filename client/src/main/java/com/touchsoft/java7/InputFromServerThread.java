@@ -19,17 +19,14 @@ public class InputFromServerThread extends Thread{
 
             // Message waiting loop
             while (!csp.isStopClient()) {
-                if (csp.getReadFromServer().ready()){
-                    msg = csp.getReadFromServer().readLine();
-                    if (msg == null){
-                        continue;
-                    }
-                    // Write msg to console
-                    System.out.println(msg);
+                msg = csp.getReadFromServer().readLine();
+                if (msg == null){
+                    continue;
                 }
-                sleep(100);
+                // Write msg to console
+                System.out.println(msg);
             }
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             csp.setStopClient(true);
         }
     }

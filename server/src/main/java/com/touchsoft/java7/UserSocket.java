@@ -114,9 +114,10 @@ public class UserSocket extends Thread {
         try {
             while (true) {
                 String word = in.readLine();
-                if (word == null){
+
+                /*if (word == null){
                     continue;
-                }
+                }*/
 
                 // Check command "/exit"
                 if (word.equals("/e") ||word.equals("/exit") ){

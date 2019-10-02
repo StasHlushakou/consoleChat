@@ -15,17 +15,15 @@ public class Client {
         try {
             // Reading cycle of messages from the console and sending them to the server
             while (!csp.isStopClient()) {
-                if (csp.getReadFromConsole().ready()){
-                    String userWord = csp.getReadFromConsole().readLine();
+                String userWord = csp.getReadFromConsole().readLine();
 
-                    // Check exit
-                    if (userWord.equals("/e") || userWord.equals("/exit")) {
-                        csp.sendMsgToServer(userWord);
-                        break;
-                    }
-                    // Send msg
+                // Check exit
+                if (userWord.equals("/e") || userWord.equals("/exit")) {
                     csp.sendMsgToServer(userWord);
+                    break;
                 }
+                // Send msg
+                csp.sendMsgToServer(userWord);
             }
             csp.setStopClient(true);
         } catch (IOException e) {

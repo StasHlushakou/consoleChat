@@ -47,6 +47,9 @@ public class ClientSocketProperties {
         } catch (IOException ignored) {}
     }
 
+
+
+
     public void sendMsgToServer(String msg){
         try {
             WriteToServer.write(msg + "\n");
@@ -56,6 +59,10 @@ public class ClientSocketProperties {
         }
 
     }
+
+
+
+
 
     public Socket getSocket() {
         return socket;
