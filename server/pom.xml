@@ -11,7 +11,6 @@
     <artifactId>server</artifactId>
     <name>server</name>
     <url>http://www.example.com</url>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.7</maven.compiler.source>
@@ -30,6 +29,9 @@
             <version>4.11</version>
             <scope>test</scope>
         </dependency>
+        <!-- Warning. Using 'dependencies.dependency.version' with LATEST or RELEASE
+        values is deprecated and may lead to errors during the build of the project
+        and during operation.-->
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
@@ -48,6 +50,7 @@
                 </plugin>
 
                 <plugin>
+
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>3.0.2</version>
                     <configuration>
