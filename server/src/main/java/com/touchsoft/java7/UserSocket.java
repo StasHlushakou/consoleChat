@@ -45,7 +45,7 @@ public class UserSocket extends Thread {
 
             this.sendMsg("From registration enter '/reg [a/c] name'" );
         } catch (IOException e){
-            logger.error(e + " in constructor.");
+            logger.error(e + " in constructor UserSocket");
         }
         start();
         logger.info("Socket connection created ");
@@ -81,7 +81,7 @@ public class UserSocket extends Thread {
     public void unconnectedUsers(){
         logger.info("Unconnected users " + userIn.getUserName() + " with" + userOut.getUserName());
 
-        userOut.getUserSocket().sendMsg(userOut.getUserName() + " left the chat ");
+        userOut.getUserSocket().sendMsg(userIn.getUserName() + " left the chat ");
         userOut.getUserSocket().sendMsg("Please wait for connection ");
         userIn.setIsConnected(false);
         userOut.setIsConnected(false);
@@ -101,7 +101,7 @@ public class UserSocket extends Thread {
             if (socket != null)
                 socket.close();
         } catch (IOException e) {
-            logger.error(e + " in thread User.");
+            logger.error(e + " in thread UserSocket.");
         }
 
         logger.info("Socket connection close");
@@ -110,7 +110,7 @@ public class UserSocket extends Thread {
     // Thread reading msg from user
     @Override
     public void run() {
-        //logger.info("Start thread");
+        logger.info("Start UserSocket thread");
         try {
             while (true) {
                 String word = in.readLine();
@@ -118,13 +118,25 @@ public class UserSocket extends Thread {
                     continue;
                 }
 
+                // Check command "/exit"
+                if (word.equals("/e") ||word.equals("/exit") ){
+                    if (userOut != null){
+                        this.unconnectedUsers();
+                    }
+                    if (userIn != null){
+                        UserList.dellUser(userIn);
+                    }
+                    break;
+                }
+
+
                 // Registration user
                 if (userIn == null){
                     matcher = pattern.matcher(word);
                     if (!matcher.matches()){
+                        this.sendMsg("From registration enter '/reg [a/c] name'");
                         continue;
-                    }
-                    if (matcher.matches()){
+                    }else {
                         Boolean isAgent;
                         if (word.substring(5,6).equals("a")){
                             isAgent = true;
@@ -144,43 +156,46 @@ public class UserSocket extends Thread {
                 if ( word.equals("/l")){
                     if (userIn.getIsConnected()){
                         this.unconnectedUsers();
+                        this.sendMsg("You left the chat ");
+                        continue;
                     }
-                    this.sendMsg("You left the chat ");
+                    this.sendMsg("You were not connected to the chat.");
                     continue;
                 }
 
-                // Check command "/exit"
-                if (word.equals("/e")){
-                    if (userOut != null){
-                        this.unconnectedUsers();
-                    }
-                    UserList.dellUser(userIn);
-                    break;
-                }
 
                 Date time = new Date();
                 SimpleDateFormat dt1 = new SimpleDateFormat("HH:mm:ss");
                 String dtime = dt1.format(time);
+                word = "(" + dtime + ") " + userIn.getUserName() + ": " + word;
+
 
                 // Add to buffer msg, when user not connected to another user
                 if (!userIn.getIsConnected()){
-
-                    msgList.add("(" + dtime + ") " + userIn.getUserName() + ": " + word);
+                    msgList.add(word);
                     userIn.setWaitingConnection(true);
                     continue;
                 }
 
                 // Send msg to connected user
                 if (userIn.getIsConnected()){
-                    userOut.getUserSocket().sendMsg("(" + dtime + ") " + userIn.getUserName() + ": " + word);
+                    userOut.getUserSocket().sendMsg(word);
                 }
             }
 
             this.closeSocket();
         } catch (IOException e) {
-            logger.error(e + " in thread User.");
-            this.unconnectedUsers();
-            UserList.dellUser(userIn);
+            logger.error(e + " in UserSocket thread.");
+
+
+            if (userIn != null){
+                if (userIn.getIsConnected()){
+                    this.unconnectedUsers();
+                }
+                UserList.dellUser(userIn);
+            }
+
+
             this.closeSocket();
         }
     }

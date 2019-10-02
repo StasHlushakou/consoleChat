@@ -19,7 +19,7 @@ public class UserList extends Thread {
         } else {
             clientList.add(user);
         }
-        logger.info(user.getUserName() + " and add to List");
+        logger.info(user.getUserName() + " and add to UserList");
     }
 
     // Dell user from collection
@@ -29,7 +29,7 @@ public class UserList extends Thread {
         } else {
             clientList.remove(user);
         }
-        logger.info("dellUser " + user.getUserName());
+        logger.info(user.getUserName() + "dell from UserList");
     }
 
     // Initial collection and starting thread
@@ -50,6 +50,7 @@ public class UserList extends Thread {
     // Thread for searching and connecting users who are waiting for a connection
     @Override
     public void run(){
+        logger.info("Start UserList thread");
 
         while (true) {
             for (User userClient : clientList) {
@@ -65,7 +66,7 @@ public class UserList extends Thread {
             try {
                 sleep(500);
             }catch (InterruptedException e){
-                logger.error(e + " in thread UserList.");
+                logger.error(e + " in UserList thread.");
             }
         }
     }
