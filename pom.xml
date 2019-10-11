@@ -12,6 +12,8 @@
         <module>client</module>
         <module>server</module>
         <module>webChat</module>
+        <module>RESTapiChat</module>
+
     </modules>
 
     <properties>
