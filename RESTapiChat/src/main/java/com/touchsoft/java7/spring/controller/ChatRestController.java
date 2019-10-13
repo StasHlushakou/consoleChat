@@ -1,23 +1,17 @@
-package com.touchsoft.java7.spring;
-
-
+package com.touchsoft.java7.spring.controller;
 
 import com.touchsoft.java7.core.Message;
-import com.touchsoft.java7.core.UserList.UserList;
 import com.touchsoft.java7.core.user.User;
 import com.touchsoft.java7.core.user.UserREST;
 import com.touchsoft.java7.spring.gson.ChatDTO;
 import com.touchsoft.java7.spring.gson.UserDTO;
-import org.apache.log4j.*;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.apache.log4j.Logger;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.ArrayList;
-import java.util.List;
+
 
 
 
@@ -106,11 +100,10 @@ public class ChatRestController {
         User client = User.findUser(false, name);
 
         if (!(client instanceof UserREST)) {
-            ResponseEntity.notFound();
             return;
         }
 
-        client.inputMsg(new Message(message));
+        client.inputMsg(new Message(client,message));
 
     }
 
@@ -121,11 +114,10 @@ public class ChatRestController {
         User agent = User.findUser(true, name);
 
         if (!(agent instanceof UserREST)) {
-            ResponseEntity.notFound();
             return;
         }
 
-        agent.inputMsg(new Message(message));
+        agent.inputMsg(new Message(agent,message));
     }
 
     @PostMapping("/getNewMessages")
@@ -136,7 +128,6 @@ public class ChatRestController {
         User user = User.findUser(isAgent , name);
 
         if (!(user instanceof UserREST)) {
-            ResponseEntity.notFound();
             return null;
         }
 
@@ -152,7 +143,6 @@ public class ChatRestController {
         User user = User.findUser(isAgent , name);
 
         if (!(user instanceof UserREST)) {
-            ResponseEntity.notFound();
             return ;
         }
 

@@ -3,6 +3,8 @@ package com.touchsoft.java7.spring.gson;
 import com.touchsoft.java7.core.UserList.ChatRoom;
 import com.touchsoft.java7.core.UserList.UserList;
 import com.touchsoft.java7.core.user.User;
+import com.touchsoft.java7.core.user.UserREST;
+import com.touchsoft.java7.core.user.UserWeb;
 
 import java.util.ArrayList;
 
@@ -11,6 +13,7 @@ public class UserDTO {
     private String state;
     private String connectUserName;
     private Integer chatId;
+    private String connectionType;
 
     private UserDTO(User user){
         this.name = user.getUserName();
@@ -28,6 +31,13 @@ public class UserDTO {
         } else {
             this.state = "Leave";
             this.connectUserName = null;
+        }
+        if (user instanceof UserREST){
+            this.connectionType = "REST";
+        } else if (user instanceof UserWeb){
+            this.connectionType = "WebSocket";
+        } else {
+            this.connectionType = "Socket";
         }
     }
 
