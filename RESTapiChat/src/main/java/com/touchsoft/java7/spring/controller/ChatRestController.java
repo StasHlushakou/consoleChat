@@ -64,7 +64,7 @@ public class ChatRestController {
     }
 
     @GetMapping("/chat/detail")
-    public ChatDTO getChatsDetail(@RequestParam(value="chatId") Integer chatId) {
+    public ChatDTO getChatsDetail(@RequestParam(value="chatId") int chatId) {
 
         LOGGER.info("getAgentDetail.");
         return Util.getChatsDetail(chatId);
