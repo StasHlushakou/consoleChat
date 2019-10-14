@@ -3,8 +3,9 @@ package com.touchsoft.java7.spring.controller;
 import com.touchsoft.java7.core.Message;
 import com.touchsoft.java7.core.user.User;
 import com.touchsoft.java7.core.user.UserREST;
-import com.touchsoft.java7.spring.gson.ChatDTO;
-import com.touchsoft.java7.spring.gson.UserDTO;
+import com.touchsoft.java7.spring.DTO.ChatDTO;
+import com.touchsoft.java7.spring.DTO.UserDTO;
+import com.touchsoft.java7.spring.DTO.Util;
 import org.apache.log4j.Logger;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,18 +20,20 @@ public class ChatRestController {
 
 
     @GetMapping("/agents")
-    public ArrayList agents() {
+    public ArrayList<UserDTO> agents(@RequestParam(value="pageNumber",defaultValue = "0") int pageNumber,
+                                     @RequestParam(value="pageSize",defaultValue = "0") int pageSize) {
 
         LOGGER.info("getAgents.");
-        return UserDTO.getAgents();
+        return Util.getAgents(pageNumber,pageSize);
 
     }
 
     @GetMapping("/agents/free")
-    public ArrayList freeAgents() {
+    public ArrayList<UserDTO> freeAgents(@RequestParam(value="pageNumber",defaultValue = "0") int pageNumber,
+                                         @RequestParam(value="pageSize",defaultValue = "0") int pageSize) {
 
         LOGGER.info("getFreeAgents.");
-        return UserDTO.getFreeAgents();
+        return Util.getFreeAgents(pageNumber,pageSize);
 
     }
 
@@ -38,7 +41,7 @@ public class ChatRestController {
     public UserDTO agentDetail(@RequestParam(value="name") String name) {
 
         LOGGER.info("getAgentDetail.");
-        return UserDTO.getAgentDetail(name);
+        return Util.getAgentDetail(name);
 
 
     }
@@ -47,15 +50,16 @@ public class ChatRestController {
     public Integer numFreeAgents() {
 
         LOGGER.info("getAgentsFreeNum.");
-        return UserDTO.getAgentsFreeNum();
+        return Util.getAgentsFreeNum();
 
     }
 
     @GetMapping("/chats")
-    public ArrayList chats() {
+    public ArrayList<ChatDTO> chats(@RequestParam(value="pageNumber",defaultValue = "0") int pageNumber,
+                                    @RequestParam(value="pageSize",defaultValue = "0") int pageSize) {
 
         LOGGER.info("getChats.");
-        return ChatDTO.getChats();
+        return Util.getChats(pageNumber,pageSize);
 
     }
 
@@ -63,23 +67,32 @@ public class ChatRestController {
     public ChatDTO getChatsDetail(@RequestParam(value="chatId") Integer chatId) {
 
         LOGGER.info("getAgentDetail.");
-        return ChatDTO.getChatsDetail(chatId);
+        return Util.getChatsDetail(chatId);
 
 
     }
 
     @GetMapping("/clients/inQueue")
-    public ArrayList clientsInqQeue() {
-        return UserDTO.getClientsInqQueue();
+    public ArrayList<UserDTO> clientsInqQeue(@RequestParam(value="pageNumber",defaultValue = "0") int pageNumber,
+                                             @RequestParam(value="pageSize",defaultValue = "0") int pageSize) {
+        return Util.getClientsInqQueue(pageNumber,pageSize);
     }
 
     @GetMapping("/client/detail")
     public UserDTO clientDetail(@RequestParam(value="name") String name) {
 
         LOGGER.info("getClientDetail.");
-        return UserDTO.getClientDetail(name);
+        return Util.getClientDetail(name);
 
     }
+
+
+
+
+
+
+
+
 
 
     @PostMapping("/regAgent")
