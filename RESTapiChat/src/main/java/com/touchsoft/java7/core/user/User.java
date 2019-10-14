@@ -68,19 +68,18 @@ public abstract class User {
 
 
     public static void connectUsers (User user1, User user2){
+        LOGGER.info("Connected " + user1.getUserName() + " with " + user2.getUserName());
+        ChatRoom chatRoom = new ChatRoom(user1 , user2);
+        user1.setConnected(true);
+        user2.setConnected(true);
+        user1.setWaitingConnection(false);
+        user2.setWaitingConnection(false);
         user1.setConnectUser(user2);
         user2.setConnectUser(user1);
         user1.sendMsg(new Message("You are connected to " + user2.getUserName()));
         user2.sendMsg(new Message("You are connected to " + user1.getUserName()));
         user1.flushOutputBufferOfUnsentMessages();
         user2.flushOutputBufferOfUnsentMessages();
-        user1.setConnected(true);
-        user2.setConnected(true);
-        user1.setWaitingConnection(false);
-        user2.setWaitingConnection(false);
-        ChatRoom chatRoom = new ChatRoom(user1 , user2);
-
-        LOGGER.info("Connected " + user1.getUserName() + " with " + user2.getUserName() + " in chat room " + chatRoom.getId());
     }
 
     public static User findUser(Boolean isAgent, String userName){
@@ -103,7 +102,22 @@ public abstract class User {
         return user;
     }
 
-
+    public static boolean UserNameIsNotFree(Boolean isAgent, String userName){
+        if (isAgent){
+            for (User u : UserList.getAgentList()){
+                if (u.getUserName().equals(userName)){
+                    return true;
+                }
+            }
+        } else {
+            for (User u : UserList.getClientList()){
+                if (u.getUserName().equals(userName)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
 
     public String getUserName() {

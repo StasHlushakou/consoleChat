@@ -1,6 +1,7 @@
 package com.touchsoft.java7.socket;
 
 import com.touchsoft.java7.core.Message;
+import com.touchsoft.java7.core.user.User;
 import com.touchsoft.java7.core.user.UserSocket;
 import org.apache.log4j.Logger;
 import java.io.IOException;
@@ -21,11 +22,20 @@ public class SocketListenerThread extends Thread {
         start();
     }
 
-
+    private void sendServiceMsg(Message msg){
+        try {
+            this.connection.getWriterUserMsg().write(msg.messageToString() + "\n");
+            this.connection.getWriterUserMsg().flush();
+        } catch (IOException e) {
+            LOGGER.error(e + " in sendMsg to Socket");
+        }
+    }
 
     @Override
     public void run() {
-        LOGGER.info("Start SocketListenerThread");
+        LOGGER.info(new Message("Start SocketListenerThread"));
+
+        this.sendServiceMsg(new Message("From registration enter '/reg [a/c] name'"));
         try {
             while (true) {
 
@@ -36,8 +46,6 @@ public class SocketListenerThread extends Thread {
 
                 if (msg.equals("/e") || msg.equals("/exit")){
                     if (connection.getUser() != null){
-                        connection.getUser().exit();
-                    }if (connection.getUser() != null){
                         connection.getUser().exit();
                     }
                     break;
@@ -56,6 +64,11 @@ public class SocketListenerThread extends Thread {
                             isAgent = false;
                         }
                         String userName = msg.substring(7);
+                        if (User.UserNameIsNotFree(isAgent, userName)){
+                            this.sendServiceMsg(new Message("This name is already taken. Choose another."));
+                            this.sendServiceMsg(new Message("From registration enter '/reg [a/c] name'"));
+                            continue;
+                        }
                         connection.setUser(new UserSocket(isAgent, userName, connection.getWriterUserMsg()));
                         continue;
                     }

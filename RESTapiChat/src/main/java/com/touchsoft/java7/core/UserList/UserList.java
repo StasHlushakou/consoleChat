@@ -37,7 +37,7 @@ public class UserList {
     // Start ConnectUserThread;
     public UserList(){
         new ConnectUserThread();
-        LOGGER.info(" create UserList");
+        LOGGER.info("Create UserList");
     }
 
     public static ArrayList<User> getClientList(){

@@ -1,11 +1,14 @@
 package com.touchsoft.java7.core.UserList;
 
 import com.touchsoft.java7.core.user.User;
-
+import org.apache.log4j.Logger;
 import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ChatRoom {
+
+    static final Logger LOGGER = Logger.getLogger(ChatRoom.class);
+
 
     private static CopyOnWriteArrayList<ChatRoom> chatRoomList = new CopyOnWriteArrayList<>();
     private static int idCount = 1;
@@ -16,6 +19,8 @@ public class ChatRoom {
 
 
     public ChatRoom(User user1, User user2) {
+        this.id = idCount;
+        idCount++;
         if (user1.isAgent()){
             this.client = user2;
             this.agent = user1;
@@ -23,19 +28,19 @@ public class ChatRoom {
             this.client = user1;
             this.agent = user2;
         }
-        this.id = idCount;
-        idCount++;
 
         user1.setChatRoom(this);
         user2.setChatRoom(this);
-
         chatRoomList.add(this);
+        LOGGER.info("New chat room with id " + this.id + " created.");
+
     }
 
     public void dellChatRoom() {
         this.client.setChatRoom(null);
         this.agent.setChatRoom(null);
         chatRoomList.remove(this);
+        LOGGER.info("Chat room with id " + this.id + " deleted.");
     }
 
     public static ArrayList<ChatRoom> getchatRoomList (){

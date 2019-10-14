@@ -25,9 +25,6 @@ public class Connection {
         try {
             this.readerUserMsg = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
             this.writerUserMsg = new BufferedWriter(new OutputStreamWriter(this.socket.getOutputStream()));
-
-            this.writerUserMsg.write("From registration enter '/reg [a/c] name'" + "\n");
-            this.writerUserMsg.flush();
         } catch (IOException e){
             LOGGER.error(e + " in constructor Connection.");
         }

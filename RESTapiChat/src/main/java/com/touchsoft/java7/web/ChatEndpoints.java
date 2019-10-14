@@ -1,6 +1,7 @@
 package com.touchsoft.java7.web;
 
 import com.touchsoft.java7.core.Message;
+import com.touchsoft.java7.core.user.User;
 import com.touchsoft.java7.core.user.UserWeb;
 import org.apache.log4j.Logger;
 import javax.websocket.OnClose;
@@ -26,14 +27,19 @@ public class ChatEndpoints {
     private Matcher matcher ;
 
 
-    @OnOpen
-    public void onOpen (Session session){
-        this.session = session;
+    public void sendServiceMsg(Message msg){
         try {
-            this.session.getBasicRemote().sendText("From registration enter '/reg [a/c] name'");
+            this.session.getBasicRemote().sendText(msg.messageToString());
         } catch (IOException e) {
             LOGGER.error(e + " in sendMsg to WebSocket");
         }
+    }
+
+
+    @OnOpen
+    public void onOpen (Session session){
+        this.session = session;
+        this.sendServiceMsg(new Message("From registration enter '/reg [a/c] name'"));
         LOGGER.info("New WebSocket connection open.");
 
     }
@@ -60,7 +66,7 @@ public class ChatEndpoints {
     @OnMessage
     public void onMessage(Session session, String msg){
 
-        if (msg.equals("/e")){
+        if (msg.equals("/e") || msg.equals("/exit")){
             if (user != null){
                 user.exit();
                 user = null;
@@ -81,13 +87,18 @@ public class ChatEndpoints {
                     isAgent = false;
                 }
                 String userName = msg.substring(7);
+                if (User.UserNameIsNotFree(isAgent, userName)){
+                    this.sendServiceMsg(new Message("This name is already taken. Choose another."));
+                    this.sendServiceMsg(new Message("From registration enter '/reg [a/c] name'"));
+                    return;
+                }
                 user = new UserWeb(isAgent, userName, this.session);
                 return;
             }
         }
 
 
-        if ( msg.equals("/l")){
+        if ( msg.equals("/l") || msg.equals("/leave")){
             if (user.isConnected()){
                 user.sendMsg(new Message("You left the chat."));
                 user.leave();

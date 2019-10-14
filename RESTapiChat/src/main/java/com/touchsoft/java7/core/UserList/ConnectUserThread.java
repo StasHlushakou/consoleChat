@@ -2,7 +2,6 @@ package com.touchsoft.java7.core.UserList;
 
 import com.touchsoft.java7.core.user.User;
 import org.apache.log4j.Logger;
-
 import java.util.ArrayList;
 
 public class ConnectUserThread extends Thread {
@@ -27,7 +26,6 @@ public class ConnectUserThread extends Thread {
                 if (!(userClient.isConnected()) && userClient.isWaitingConnection()) {
                     for (User userAgent : agentList) {
                         if ((!userAgent.isConnected()) && userAgent.isWaitingConnection()) {
-                            new ChatRoom(userClient,userAgent);
                             User.connectUsers(userClient,userAgent);
                             break;
                         }
