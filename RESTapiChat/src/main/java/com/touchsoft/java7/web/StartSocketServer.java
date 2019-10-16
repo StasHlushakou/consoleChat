@@ -9,20 +9,22 @@ import javax.servlet.annotation.WebListener;
 import java.io.File;
 
 // Start ConsoleSocket
+
 @WebListener
 public class StartSocketServer implements ServletContextListener {
 
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
-        // initialize log4j
 
+        // initialize log4j
         ServletContext context = servletContextEvent.getServletContext();
         context.setInitParameter("log4j-config-location", "WEB-INF/log4j.properties");
 
         String log4jConfigFile = context.getInitParameter("log4j-config-location");
         String fullPath = context.getRealPath("") + File.separator + log4jConfigFile;
         PropertyConfigurator.configure(fullPath);
+
         new RegSocketConnectionThread();
     }
 

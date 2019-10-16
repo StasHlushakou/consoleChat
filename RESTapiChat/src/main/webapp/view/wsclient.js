@@ -11,7 +11,7 @@ function onConnectClick() {
     var ws_protocol = "ws";   //document.getElementById("protocol").value;
     var ws_hostname = "localhost";   //document.getElementById("hostname").value;
     var ws_port     = "8080";   //document.getElementById("port").value;
-    var ws_endpoint = "/RESTapiChat/chat";   //document.getElementById("endpoint").value;
+    var ws_endpoint = "/${pageContext.request.contextPath}/chat";   //document.getElementById("endpoint").value;
 
     openWSConnection(ws_protocol, ws_hostname, ws_port, ws_endpoint);
 }

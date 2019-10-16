@@ -1,0 +1,9 @@
+<style>
+            table    { border: 2px solid black; }
+            input    { width: 300px; }
+            select   { width: 300px; }
+            textarea { width: 513px; border: 2px solid black; }
+            #btnConnect    { width: 100px; }
+            #btnDisconnect { width: 100px; }
+            #btnSend       { width: 100px; }
+</style>

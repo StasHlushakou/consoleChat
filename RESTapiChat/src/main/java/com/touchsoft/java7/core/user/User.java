@@ -32,7 +32,6 @@ public abstract class User {
             this.getConnectUser().setWaitingConnection(true);
             chatRoom.dellChatRoom();
         }
-        return;
     }
 
     public void exit(){
