@@ -9,8 +9,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
-import org.springframework.web.servlet.view.JstlView;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
 
 @Configuration
 @EnableWebMvc
@@ -22,6 +21,9 @@ public class ChatConfiguration implements WebMvcConfigurer {
         registry.addViewController("/").setViewName("wsclient");
     }
 
+
+
+
     @Bean
     public ViewResolver viewResolver() {
         InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
@@ -31,11 +33,16 @@ public class ChatConfiguration implements WebMvcConfigurer {
     }
 
 
+
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         //registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
         //registry.addResourceHandler("/swagger-ui.html**").addResourceLocations("classpath:/META-INF/resources/swagger-ui.html");
         registry.addResourceHandler("/view/**").addResourceLocations("/view/");
+
+
+
     }
 
 }

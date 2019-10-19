@@ -19,7 +19,6 @@ public class RegSocketConnectionThread extends Thread{
     public void run(){
                 try (ServerSocket server = new ServerSocket(4045)){
             LOGGER.info("Started RegSocketConnectionThread");
-            new UserList();
 
             while (true){
                 Socket clientSocket = server.accept();

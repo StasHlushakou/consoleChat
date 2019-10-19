@@ -21,6 +21,7 @@
         <!-- <org.springframework.version>4.0.2.RELEASE</org.springframework.version> -->
     </properties>
 
+
   <dependencies>
       <dependency>
           <groupId>javax.servlet</groupId>
@@ -112,17 +113,33 @@
 
 
 
-
+      <dependency>
+          <groupId>org.springframework.plugin</groupId>
+          <artifactId>spring-plugin-core</artifactId>
+          <version>1.2.0.RELEASE</version>
+      </dependency>
       <dependency>
           <groupId>io.springfox</groupId>
           <artifactId>springfox-swagger2</artifactId>
-          <version>2.4.0</version>
+          <version>2.9.2</version>
       </dependency>
       <dependency>
           <groupId>io.springfox</groupId>
           <artifactId>springfox-swagger-ui</artifactId>
-          <version>2.4.0</version>
+          <version>2.9.2</version>
       </dependency>
+
+
+      <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-simple</artifactId>
+          <version>1.7.26</version>
+      </dependency>
+
+
+
+
+
 
 
 
